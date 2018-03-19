@@ -1,6 +1,7 @@
 import socket
 import sys
 import time
+import re
 
 PORT= sys.argv[1] #Port specified by arugment when running script
 SERVER_PASSWORD= sys.argv[2] #Server password send when running script
@@ -9,7 +10,16 @@ INPUT_FILE= sys.argv[3] #Text file input when running script
 UDP_SERVER_VER = "1.0"
 UDP_SERVER_IP = "127.0.0.1"
 UDP_BUFFER=4096
-PASS= 'CYBER'
+#SERVER_PASS= "CYBER"
+SECRET_PASS=str(SERVER_PASSWORD)
+print(SECRET_PASS)
+
+ACCEPT= "PASS_ACCEPT"
+s1=str(ACCEPT)
+b1= bytes(s1, 'utf-8')
+REJECT= "PASS_REJECT"
+s2=str(REJECT)
+b2= bytes(s2, 'utf-8')
 
 NEW_PORT=int(PORT) #Convert port to integer
 addr2= (UDP_SERVER_IP, NEW_PORT)
@@ -22,52 +32,63 @@ print ()
 print ("Server IP: ", UDP_SERVER_IP, "Listenting on Port:", PORT) #Print Port and IP
 print()
 
-#Create socket
-UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-print ('Socket Initialized')
+
+
+
+UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Create UDP Socket
+print ('Socket Initialized...')
 UDPSock.bind((UDP_SERVER_IP, NEW_PORT)) #Bind the socket to IP/Port
 print ()
-password = UDPSock.recvfrom(UDP_BUFFER)
-print ("Client Sent Password:", password)
 print ()
 
-
-
-	
-#Keep socket running, recieve message from client and send data back
-while True:
+while True: #Keep socket running, recieve message from client and send data back
 	
 	data, addr = UDPSock.recvfrom(UDP_BUFFER)
 	print ("Client connected from IP:", addr)
 	print ()
-	print ("Client Sent:", data.decode("utf-8"))	
-	print ()
+	#print ("Client Sent:", data.decode("utf-8"))
+	payload_data=data.decode("utf-8") #decode payload data to string
+	payload_data2=payload_data.split(",") #split payload by comma
+	Temp_REQ=payload_data2[0] 
+	SEND_REQ=re.sub('[^A-Za-z0-9]+', '', Temp_REQ)#strip crap
+	PASS1=payload_data2[1]
+	NEW_PASS1=re.sub('[^A-Za-z0-9]+', '', PASS1)#strip crap
+	PASS2=payload_data2[2]
+	NEW_PASS2=re.sub('[^A-Za-z0-9]+', '', PASS2)#strip crap
+	PASS3=payload_data2[3]
+	NEW_PASS3=re.sub('[^A-Za-z0-9]+', '', PASS3)#strip crap
+
 	
+	if NEW_PASS1 == SECRET_PASS:
+		UDPSock.sendto(b1,(UDP_SERVER_IP,NEW_PORT))
+	elif NEW_PASS2 == SECRET_PASS:
+		UDPSock.sendto(b1, (UDP_SERVER_IP,NEW_PORT))
+		print("PASS2 ACCEPT")
+	elif NEW_PASS3 == SECRET_PASS:
+		UDPSock.sendto(b1,(UDP_SERVER_IP,NEW_PORT))
+	else:
+		UDPSock.sendto(b2,(UDP_SERVER_IP,NEW_PORT))
+		print("ABORT..Wrong Password")
+		exit()
+		
+	print ()
+	print ("Client Sent Password of:", payload_data)
+	#clean_data= payload_data.spilt(",")
+	#print ("client sent password new:", clean_data)
+	print ()
 	INPUTFILE1= open(str(sys.argv[3]), "r")
 	line= INPUTFILE1.read()
 	print("Text File Contents:",line)
 	if line:
 		bytes1 = bytes(line, 'utf-8')
-		print("Data Read:", bytes1, end='')
+		#print("Data Read:", bytes1, end='')
 		UDPSock.sendto(bytes1,addr)
+		print ("File Data Sent to Client Succesfully")
 	else:
 		break
-		#sent= UDPSock.sendto(data, addr)
-		#print (sent, addr)
 	break
-#==================================================================================		
+
 print()
-#method to recive .txt file from argumnet when launching script and then take file and send back to client
-UDPSock.sendto(INPUT_FILE.encode('utf-8'),addr2)
-#f=open(filename, "rb")
-f=open(sys.argv[3], 'rb')
-data1= f.read(UDP_BUFFER)
-print ("Name of File Input:", INPUT_FILE)
-#print ("File Contents:", data1)
+print("OK..Goodbye")
 
-
-
-
-
-print ("File sent to client...OK")
 UDPSock.close()

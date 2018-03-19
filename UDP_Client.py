@@ -3,9 +3,22 @@ import sys
 import getpass
 import hashlib
 
-#UDP_PORT1=sys.argv[1]
-UDP_PORT= 8900
-Message = b'Sending Test Message' #Testing Send Data to Server
+
+INPUT_PORT=sys.argv[1] 	#port arugement
+CLIENT_PASS1=sys.argv[2] #client password 1
+CLIENT_PASS2=sys.argv[3] #client password 2
+CLIENT_PASS3=sys.argv[4] #client password 3
+OUTPUT_FILE=sys.argv[5] #output file arguement
+OF=str(OUTPUT_FILE) #convert output file name to string
+PORT=int(INPUT_PORT) #convert port string to integer before passing to socket connect
+
+PAYLOAD= ["JOIN_REQ",CLIENT_PASS1,CLIENT_PASS2,CLIENT_PASS3] #password payload packet
+s=str(PAYLOAD) #payload string convert
+b= bytes(s, 'utf-8') #payload converted to bytes
+
+
+
+PASS1 = b'Sending Test Message' #Testing Send Data to Server
 
 print ("Welcome to UPD Connect")
 print ()
@@ -16,60 +29,21 @@ IP_ADDR= input()
 print()
 print ("You entered IPv4:")
 print (IP_ADDR)
+PORT=int(INPUT_PORT) #convert port string to integer before passing to socket connect
 
-user_pass = input('please enter pass: ')
-bytes= bytearray()
-bytes.extend(map(ord,user_pass))
+
+clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #INITIATE UDP Socket
+
 
 while True:
-	clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	clientSock.connect((IP_ADDR, UDP_PORT))
-	clientSock.send(bytes)
-	clientSock.close()
+	clientSock.sendto(b, (IP_ADDR, PORT))
+	data= clientSock.recvfrom(4096)
+	strdata=str(data)
+	new_file= open(OF, "w+")
+	new_file.write(strdata)
+	new_file.close()
+	#print("Server File Data:",data)
+	print()
+	print ("OK")
 	break
-	
-
-clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-clientSock.connect((IP_ADDR, UDP_PORT))
-#clientSock.send(bytes)
-clientSock.sendto(Message, (IP_ADDR, UDP_PORT))
-
-data= clientSock.recvfrom(4096)
-strdata=str(data)
-new_file= open("Output.txt", "w+")
-new_file.write(strdata)
-new_file.close()
-
-
-print("Server File Data:",data)
-'''
-f = open ('test.txt', 'wb')
-f.write(data)
-f.close()
-
-'''
-#print ("You sent the server the following information :" ,data)
-'''
-with open('newfile.txt', 'w') as f:
-	f.write(data3)
-
-'''	
-'''
-while True:
-	clientSock.connect((IP_ADDR, UDP_PORT))
-	f= open(data, 'wb')
-	data =clientSock.recvfrom(2048)
-	while (data):
-		print ("Recieving File..")
-		f.write(data)
-		data =clientSock.recvfrom(2048)
-	f.close()
-	print ("done receving")
-	clientSock.close()
-	
-	'''
-		
-
-
-print ("OK")
 clientSock.close()
