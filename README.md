@@ -8,7 +8,7 @@ udp_client.py udp_server.py python.txt
 
 Launch udp_server.py with the following arugments:
 
-udp_server.py port number <password> <input.txt>
+udp_server.py port number password input.txt
 
 *port number must be a valid computer port 1-49151
 
@@ -20,7 +20,7 @@ After launching your server please launch the client
 
 Launch udp_client.py with the following arugments:
 
-udp_client.py <serverIP> <port> <password1> <password2> <password3> <outputfile.txt>
+udp_client.py serverIP port password1 password2 password3 outputfile.txt
 
 *server IP should be entered as the loopback 127.0.0.1 since the udp_server.py is hard coded with that IP
 
