@@ -8,7 +8,7 @@ udp_client.py udp_server.py python.txt
 
 Launch udp_server.py with the following arugments:
   udp_server.py <port number> <password> <input.txt>
-  *port number must be a valid computer port 1-65535
+  *port number must be a valid computer port 1-49151
   *password can be a random string created by you
   *input.txt can be any text file with text inside of it.
   
