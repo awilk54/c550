@@ -8,7 +8,7 @@ udp_client.py udp_server.py python.txt
 
 Launch udp_server.py with the following arugments:
 
-udp_server.py <port number> <password> <input.txt>
+udp_server.py port number <password> <input.txt>
 
 *port number must be a valid computer port 1-49151
 
