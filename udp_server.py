@@ -12,7 +12,7 @@ UDP_SERVER_IP = "127.0.0.1"
 UDP_BUFFER=4096
 #SERVER_PASS= "CYBER"
 SECRET_PASS=str(SERVER_PASSWORD)
-print(SECRET_PASS)
+#print(SECRET_PASS)
 
 ACCEPT= "PASS_ACCEPT"
 s1=str(ACCEPT)
@@ -20,11 +20,13 @@ b1= bytes(s1, 'utf-8')
 REJECT= "PASS_REJECT"
 s2=str(REJECT)
 b2= bytes(s2, 'utf-8')
+PR=b'PASS_REQ' # pass_req packet variable as byte
+TERM=b'TERMINATE' #TERMINATE packet varaible as byte
 
 NEW_PORT=int(PORT) #Convert port to integer
 addr2= (UDP_SERVER_IP, NEW_PORT)
 
-	
+
 
 print ()
 print ("Server Version: ", UDP_SERVER_VER) #print server info
@@ -38,15 +40,21 @@ print()
 UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Create UDP Socket
 print ('Socket Initialized...')
 UDPSock.bind((UDP_SERVER_IP, NEW_PORT)) #Bind the socket to IP/Port
+#data, addr = UDPSock.recvfrom(UDP_BUFFER)
 print ()
 print ()
+
 
 while True: #Keep socket running, recieve message from client and send data back
 	
 	data, addr = UDPSock.recvfrom(UDP_BUFFER)
-	print ("Client connected from IP:", addr)
+	print ("A Client Machine Has Just Connected From IP:", addr)
 	print ()
+	UDPSock.sendto(PR,addr)#send Pass_REQ packet
 	#print ("Client Sent:", data.decode("utf-8"))
+	PR=UDPSock.recvfrom(UDP_BUFFER)
+	print ("RX PASS_RESP Packet")
+	print ()
 	payload_data=data.decode("utf-8") #decode payload data to string
 	payload_data2=payload_data.split(",") #split payload by comma
 	Temp_REQ=payload_data2[0] 
@@ -60,35 +68,43 @@ while True: #Keep socket running, recieve message from client and send data back
 
 	
 	if NEW_PASS1 == SECRET_PASS:
-		UDPSock.sendto(b1,(UDP_SERVER_IP,NEW_PORT))
+		UDPSock.sendto(b1,addr)
+		print("TX PASS_ACCEPT Packet")
 	elif NEW_PASS2 == SECRET_PASS:
-		UDPSock.sendto(b1, (UDP_SERVER_IP,NEW_PORT))
-		print("PASS2 ACCEPT")
+		UDPSock.sendto(b1,addr)
+		print("TX PASS_ACCEPT Packet")
 	elif NEW_PASS3 == SECRET_PASS:
-		UDPSock.sendto(b1,(UDP_SERVER_IP,NEW_PORT))
+		UDPSock.sendto(b1,addr)
+		print("TX PASS_ACCEPT Packet")
 	else:
-		UDPSock.sendto(b2,(UDP_SERVER_IP,NEW_PORT))
+		UDPSock.sendto(b2,addr)
 		print("ABORT..Wrong Password")
+		print ()
+		UDPSock.sendto(TERM,addr) #packet to reject password attempt
+		print ("TX TERMINATE Packet")
 		exit()
 		
 	print ()
-	print ("Client Sent Password of:", payload_data)
+	#print ("Client Sent Password of:", payload_data) 
 	#clean_data= payload_data.spilt(",")
 	#print ("client sent password new:", clean_data)
 	print ()
 	INPUTFILE1= open(str(sys.argv[3]), "r")
 	line= INPUTFILE1.read()
-	print("Text File Contents:",line)
+	print("Reading TXT File...")
+	print()
 	if line:
 		bytes1 = bytes(line, 'utf-8')
 		#print("Data Read:", bytes1, end='')
+		
 		UDPSock.sendto(bytes1,addr)
-		print ("File Data Sent to Client Succesfully")
+		print ("TXT File Data Sent to Client Succesfully!")
 	else:
 		break
 	break
 
 print()
-print("OK..Goodbye")
-
+print("OK!")
+print("Goodbye. Now Exitng..")
+UDPSock.sendto(TERM,addr)
 UDPSock.close()

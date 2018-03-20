@@ -2,6 +2,7 @@ import socket
 import sys
 import getpass
 import hashlib
+import re
 
 
 INPUT_PORT=sys.argv[1] 	#port arugement
@@ -15,20 +16,23 @@ PORT=int(INPUT_PORT) #convert port string to integer before passing to socket co
 PAYLOAD= ["JOIN_REQ",CLIENT_PASS1,CLIENT_PASS2,CLIENT_PASS3] #password payload packet
 s=str(PAYLOAD) #payload string convert
 b= bytes(s, 'utf-8') #payload converted to bytes
+JR=b'PASS_RESP' #Join Request byte for sending to server
+REJECT="PASSREJECT" #reject packet string for IF compare
 
-
-
-PASS1 = b'Sending Test Message' #Testing Send Data to Server
-
+print()
 print ("Welcome to UPD Connect")
+print ("Coded by Anthony Wilkinson, CYBER550")
 print ()
 
 # Ask for IP address of server
-print("Please Enter IPv4 Address:")
+print("Please Enter IPv4 Server Address:")
 IP_ADDR= input()
+SRV_ADDRESS= (IP_ADDR, PORT) #var tuple for sending server address and port
 print()
-print ("You entered IPv4:")
+print ("You Entered IPV4 Server Address:")
 print (IP_ADDR)
+print ()
+print ()
 PORT=int(INPUT_PORT) #convert port string to integer before passing to socket connect
 
 
@@ -37,6 +41,22 @@ clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #INITIATE UDP Sock
 
 while True:
 	clientSock.sendto(b, (IP_ADDR, PORT))
+	data= clientSock.recvfrom(4096) #recieve pass_req
+	print ("RX PASS_REQ Packet")
+	clientSock.sendto(JR,SRV_ADDRESS)#send pass_resp packet
+	print ()
+	print ("TX PASS_RESP Packet") 
+	data, addr= clientSock.recvfrom(4096) #recieve pass_accept
+	deny_data=data.decode("utf-8") #decode reject packet data to string
+	deny_data2=deny_data.split(",") #split payload by comma
+	TEMP_DENY=deny_data2[0] 
+	DENY=re.sub('[^A-Za-z0-9]+', '', TEMP_DENY)#take out random chars
+	print ()
+	if DENY == REJECT:
+		print ("Invalid Password...Now Exiting")
+		print ("ABORT!!")
+		exit()
+	print ("RX PASS_ACCEPT Packet")
 	data= clientSock.recvfrom(4096)
 	strdata=str(data)
 	new_file= open(OF, "w+")
@@ -44,6 +64,9 @@ while True:
 	new_file.close()
 	#print("Server File Data:",data)
 	print()
+	print ("RX Terminate Packet")
+	print ()
 	print ("OK")
+	data= clientSock.recvfrom(4096)
 	break
 clientSock.close()
