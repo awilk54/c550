@@ -20,3 +20,4 @@ Launch udp_client.py with the following arugments:
   *port number should be the same port as you passed as an arugment when launching the server
   *password1-3 should be three passwords created by you. only one will match the server password. If 1 of 3 passwords authenticate with the server, then the server will send it's text file to the client. If not, it will termiante and tell you invalid password.
   *outputfile.txt can be named whatever you like. This is the output file that your client will use to write all data send from text file on udp_server.
+  
