@@ -15,7 +15,10 @@ PORT=int(INPUT_PORT) #convert port string to integer before passing to socket co
 SRV_IP=(SERVER_IP) #convert server ip string to integer before passing to socket connect
 #print (SRV_IP)
 
-PAYLOAD= ["JOIN_REQ",CLIENT_PASS1,CLIENT_PASS2,CLIENT_PASS3] #password payload packet
+#PAYLOAD= ["JOIN_REQ",CLIENT_PASS1,CLIENT_PASS2,CLIENT_PASS3] #password payload packet
+PAYLOAD= [CLIENT_PASS1,CLIENT_PASS2,CLIENT_PASS3] #password payload packet
+JOIN_REQ="JOIN_REQ"
+JOIN_REQ1=JOIN_REQ.encode()
 s=str(PAYLOAD) #payload string convert
 b= bytes(s, 'utf-8') #payload converted to bytes
 JR=b'PASS_RESP' #Join Request byte for sending to server
@@ -33,9 +36,10 @@ clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #INITIATE UDP Sock
 
 
 while True:
-	clientSock.sendto(b, (SRV_IP, PORT))
+	clientSock.sendto(JOIN_REQ1,SRV_ADDRESS)
 	data= clientSock.recvfrom(4096) #recieve pass_req
 	print ("RX PASS_REQ Packet")
+	clientSock.sendto(b, (SRV_IP, PORT))
 	clientSock.sendto(JR,SRV_ADDRESS)#send pass_resp packet
 	print ()
 	print ("TX PASS_RESP Packet") 

@@ -47,24 +47,25 @@ print ()
 
 
 while True: #Keep socket running, recieve message from client and send data back
-	
+	data, addr = UDPSock.recvfrom(UDP_BUFFER)
+	print ("RX JOIN_REQ Packet")
+	UDPSock.sendto(PR,addr)#send Pass_REQ packet
 	data, addr = UDPSock.recvfrom(UDP_BUFFER)
 	print ("A Client Machine Has Just Connected From IP:", addr)
 	print ()
-	UDPSock.sendto(PR,addr)#send Pass_REQ packet
 	#print ("Client Sent:", data.decode("utf-8"))
 	PR=UDPSock.recvfrom(UDP_BUFFER)
 	print ("RX PASS_RESP Packet")
 	print ()
 	payload_data=data.decode("utf-8") #decode payload data to string
 	payload_data2=payload_data.split(",") #split payload by comma
-	Temp_REQ=payload_data2[0] 
-	SEND_REQ=re.sub('[^A-Za-z0-9]+', '', Temp_REQ)#strip crap
-	PASS1=payload_data2[1]
+	#Temp_REQ=payload_data2[0] 
+	#SEND_REQ=re.sub('[^A-Za-z0-9]+', '', Temp_REQ)#strip crap
+	PASS1=payload_data2[0]
 	NEW_PASS1=re.sub('[^A-Za-z0-9]+', '', PASS1)#strip crap
-	PASS2=payload_data2[2]
+	PASS2=payload_data2[1]
 	NEW_PASS2=re.sub('[^A-Za-z0-9]+', '', PASS2)#strip crap
-	PASS3=payload_data2[3]
+	PASS3=payload_data2[2]
 	NEW_PASS3=re.sub('[^A-Za-z0-9]+', '', PASS3)#strip crap
 
 	
