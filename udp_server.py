@@ -2,6 +2,7 @@ import socket
 import sys
 import time
 import re
+import hashlib
 
 PORT= sys.argv[1] #Port specified by arugment when running script
 SERVER_PASSWORD= sys.argv[2] #Server password send when running script
@@ -91,6 +92,7 @@ while True: #Keep socket running, recieve message from client and send data back
 	print ()
 	INPUTFILE1= open(str(sys.argv[3]), "r")
 	line= INPUTFILE1.read()
+	
 	print("Reading TXT File...")
 	print()
 	if line:
@@ -98,7 +100,13 @@ while True: #Keep socket running, recieve message from client and send data back
 		#print("Data Read:", bytes1, end='')
 		
 		UDPSock.sendto(bytes1,addr)
+		hash_file = hashlib.sha1(bytes1)
+		hex_dig = hash_file.hexdigest()
+		hex_dig1=hex_dig.encode()
+		UDPSock.sendto(hex_dig1,addr)
 		print ("TXT File Data Sent to Client Succesfully!")
+		print()
+		print("File_Hash:",hex_dig)
 	else:
 		break
 	break
